@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { extractMermaidBlocks } from './extract.ts';
-import { insertMarkers, replaceMarkers } from './glow.ts';
+import {
+  codeBlock,
+  fileExtension,
+  insertMarkers,
+  isMarkdownFile,
+  replaceMarkers,
+} from './glow.ts';
 
 const MARKER_PREFIX = /MDVIEW[0-9a-f]{8}X/g;
 
@@ -22,6 +28,59 @@ function markerPrefix(): string {
   assert.ok(prefix);
   return prefix;
 }
+
+describe('isMarkdownFile', () => {
+  test('Markdown の拡張子なら、大文字・小文字によらず Markdown として扱う', () => {
+    for (const path of [
+      'note.md',
+      'note.mdown',
+      'note.mkdn',
+      'note.mkd',
+      'note.markdown',
+      'NOTE.MD',
+    ]) {
+      assert.equal(isMarkdownFile(path), true, path);
+    }
+  });
+
+  test('拡張子がなければ Markdown として扱う', () => {
+    assert.equal(isMarkdownFile('README'), true);
+  });
+
+  test('Markdown 以外の拡張子ならコードとして扱う', () => {
+    for (const path of ['data.json', 'note.md.txt', '.zshrc']) {
+      assert.equal(isMarkdownFile(path), false, path);
+    }
+  });
+});
+
+describe('fileExtension', () => {
+  test('最後のドットから後ろを拡張子にする', () => {
+    assert.equal(fileExtension('archive.tar.gz'), '.gz');
+  });
+
+  test('ドットで始まるファイル名は、名前全体を拡張子にする', () => {
+    assert.equal(fileExtension('.zshrc'), '.zshrc');
+  });
+
+  test('ディレクトリ名のドットは拡張子にしない', () => {
+    assert.equal(fileExtension('notes.d/README'), '');
+  });
+});
+
+describe('codeBlock', () => {
+  test('言語名を付けたコードブロックで囲む', () => {
+    assert.equal(codeBlock('{}\n', 'json'), '```json\n{}\n```\n');
+  });
+
+  test('末尾に改行がなければ、閉じる前に改行を足す', () => {
+    assert.equal(codeBlock('{}', 'json'), '```json\n{}\n```\n');
+  });
+
+  test('中身のどのバッククォートの並びよりも長いバッククォートで囲む', () => {
+    assert.equal(codeBlock('```\n````\n', 'md'), '`````md\n```\n````\n`````\n');
+  });
+});
 
 describe('insertMarkers', () => {
   test('図をマーカーだけのコードブロックに置き換える', () => {

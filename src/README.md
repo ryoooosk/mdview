@@ -6,9 +6,13 @@
 
 ```mermaid
 flowchart TD
-    IN[/"ファイル・標準入力"/] -- Markdown --> TERM{"terminal.ts<br>supportsKittyGraphics"}
+    IN[/"ファイル・標準入力"/] --> KIND{"glow.ts<br>isMarkdownFile"}
+    KIND -- "Markdown 以外のファイル" --> GLOW_CODE["glow.ts<br>runGlowCode"]
+    GLOW_CODE -- "整形済みテキスト" --> OUT[/"標準出力"/]
+
+    KIND -- "Markdown・標準入力" --> TERM{"terminal.ts<br>supportsKittyGraphics"}
     TERM -- "図を表示しない" --> GLOW_PLAIN["glow.ts<br>runGlow"]
-    GLOW_PLAIN -- "整形済みテキスト" --> OUT[/"標準出力"/]
+    GLOW_PLAIN -- "整形済みテキスト" --> OUT
 
     TERM -- "図を表示する" --> EXTRACT["extract.ts<br>extractMermaidBlocks"]
     EXTRACT -- "図のソース" --> READ["cache.ts<br>readCache"]
@@ -26,6 +30,8 @@ flowchart TD
     KITTY -- "画像のエスケープシーケンス" --> REPLACE
     REPLACE -- "図を差し込んだテキスト" --> OUT
 ```
+
+Markdown 以外のファイル（拡張子が `.md` などでないファイル）は、拡張子を言語名にしたコードブロックで囲んで glow に渡す。図の処理はしないので、Chrome も起動しない。このとき glow には dark ではなく `styles/code.json` のスタイルを渡す。glamour の dark スタイルから、コードブロックの左の余白だけを 0 にしたもので、glow でファイルを開いたときと同じ表示になる。各項目の見取り表は [styles/README.md](../styles/README.md) にある。
 
 描画に失敗した図はマーカーに置き換えず、mermaid のコードブロックのまま glow に渡す。図を表示しない条件は [README](../README.md#図が表示される条件) を参照。
 
@@ -131,6 +137,6 @@ glow は画像を扱えないので、図をマーカー（図を置く位置の
 | `cache.ts` | 図のソースと描画条件からキーを作り、PNG を読み書きする。14 日使われていない PNG を消す | `cacheKey`、`readCache`、`writeCache`、`pruneCache` |
 | `render.ts` | インストール済みの Chrome と mermaid-cli で PNG を描画する | `createRenderer`、`RENDER_OPTIONS` |
 | `kitty.ts` | PNG を kitty graphics protocol のエスケープシーケンスにする | `kittyImage`、`pngWidth` |
-| `glow.ts` | マーカーの差し込み、glow の呼び出し、マーカーの差し替え | `insertMarkers`、`runGlow`、`replaceMarkers` |
+| `glow.ts` | Markdown かどうかの判定、マーカーの差し込み、glow の呼び出し、マーカーの差し替え | `isMarkdownFile`、`insertMarkers`、`runGlow`、`runGlowCode`、`replaceMarkers` |
 
 `extract.ts`・`kitty.ts`・`glow.ts` のテストは、同じディレクトリの `*.test.ts` にある（`pnpm test` で実行する）。ほかのモジュールにはまだテストがない。

@@ -37,6 +37,7 @@ pnpm add -g link:$PWD
 
 ```bash
 mdview ノート.md            # ファイルを表示する
+mdview data.json            # Markdown 以外のファイルは、コードとして色分けして表示する
 cat ノート.md | mdview -    # 標準入力から読む
 mdview -w 80 ノート.md      # 80 桁の幅で表示する
 ```
@@ -78,6 +79,7 @@ rm -rf ~/Library/Caches/mdview
 - 図は、ターミナルの幅によらず幅 800px の領域で描く。ほとんどの図は領域の幅に関係なく同じ大きさになるが、gantt（ガントチャート）と xychart（XY チャート）は領域に合わせて広がるため、いつも同じ幅（gantt は約 800px、xychart は 700px）で描かれる。それより狭いターミナルでは縮小されて表示される
 - 縦に長い図は画面に収まらないので、スクロールして見る
 - Ghostty が保持する画像の容量には上限（`image-storage-limit`）があり、長く使っていると古い画像が消えることがある
+- Markdown 以外のファイルの配色は、glow 3.0.0 が使う glamour v2.0.1 の dark スタイルから写したもの（`styles/code.json`）。glow が配色を変えると、Markdown 内のコードブロックと色がずれることがある
 
 ## 開発
 
