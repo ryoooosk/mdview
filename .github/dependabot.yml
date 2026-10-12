@@ -19,6 +19,10 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 14
+    ignore:
+      # major を上げないのは、package.json の engines が対象にする Node 24 にない API を、型エラーなしで使えてしまうため
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       npm:
         patterns:
