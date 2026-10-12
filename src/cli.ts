@@ -4,7 +4,14 @@ import { text } from 'node:stream/consumers';
 import { parseArgs } from 'node:util';
 import { cacheKey, pruneCache, readCache, writeCache } from './cache.ts';
 import { extractMermaidBlocks } from './extract.ts';
-import { insertMarkers, replaceMarkers, runGlow } from './glow.ts';
+import {
+  fileExtension,
+  insertMarkers,
+  isMarkdownFile,
+  replaceMarkers,
+  runGlow,
+  runGlowCode,
+} from './glow.ts';
 import { kittyImage, pngWidth } from './kitty.ts';
 import {
   createRenderer,
@@ -30,6 +37,13 @@ async function main(): Promise<void> {
     values.width === undefined
       ? terminalColumns(process.stdout)
       : parseColumns(values.width);
+
+  if (input !== '-' && !isMarkdownFile(input)) {
+    const source = await readFile(input, 'utf8');
+    const language = fileExtension(input).slice(1);
+    process.stdout.write(await runGlowCode(source, language, columns));
+    return;
+  }
   const markdown =
     input === '-' ? await text(process.stdin) : await readFile(input, 'utf8');
 
