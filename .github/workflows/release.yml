@@ -13,9 +13,21 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        # 依存のキャッシュを使わないのは、配布する tarball をキャッシュの中身に左右されずに作るため
+        with:
+          node-version-file: .nvmrc
+
+      - run: pnpm ci
+      - run: pnpm build
+      - run: pnpm pack --out mdview.tgz
+
       - name: create release
         # タグ名を run に直接埋め込まないのは、タグ名に含まれる文字がシェルのコマンドとして実行されないようにするため
-        run: gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --generate-notes --verify-tag
+        run: gh release create "$TAG" mdview.tgz --repo "$GITHUB_REPOSITORY" --generate-notes --verify-tag
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
