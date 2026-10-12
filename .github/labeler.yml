@@ -1,0 +1,19 @@
+enhancement:
+  - head-branch:
+      - "^feature/"
+      - "^develop/"
+
+bug:
+  - head-branch:
+      - "^fix/"
+      - "^hotfix/"
+      - "^bugfix/"
+
+refactor:
+  - head-branch:
+      - "^refactor/"
+
+documentation:
+  - changed-files:
+      - any-glob-to-all-files:
+          - "**/*.md"
