@@ -9,7 +9,9 @@
   },
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "check": "biome check --write --no-errors-on-unmatched",
+    "biome:ci": "biome ci",
     "test": "node --test 'src/**/*.test.ts'",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-include-all --test-coverage-include='src/**/*.ts' --test-coverage-exclude='src/**/*.test.ts' 'src/**/*.test.ts'"
   },

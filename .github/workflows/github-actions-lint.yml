@@ -1,0 +1,17 @@
+name: GitHub Actions Lint
+
+on:
+  pull_request:
+    paths:
+      - ".github/**"
+
+concurrency:
+  group: ${{ github.action }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  github-actions-lint:
+    uses: ryoooosk/reusable-workflows/.github/workflows/github-actions-lint.yml@main
