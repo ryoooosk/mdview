@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { extractMermaidBlocks } from './extract.ts';
 import {
+  codeBlock,
   fileExtension,
   insertMarkers,
   isMarkdownFile,
@@ -64,6 +65,20 @@ describe('fileExtension', () => {
 
   test('ディレクトリ名のドットは拡張子にしない', () => {
     assert.equal(fileExtension('notes.d/README'), '');
+  });
+});
+
+describe('codeBlock', () => {
+  test('言語名を付けたコードブロックで囲む', () => {
+    assert.equal(codeBlock('{}\n', 'json'), '```json\n{}\n```\n');
+  });
+
+  test('末尾に改行がなければ、閉じる前に改行を足す', () => {
+    assert.equal(codeBlock('{}', 'json'), '```json\n{}\n```\n');
+  });
+
+  test('中身のどのバッククォートの並びよりも長いバッククォートで囲む', () => {
+    assert.equal(codeBlock('```\n````\n', 'md'), '`````md\n```\n````\n`````\n');
   });
 });
 

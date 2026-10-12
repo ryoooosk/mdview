@@ -29,6 +29,16 @@ export function fileExtension(path: string): string {
   return dot === -1 ? '' : name.slice(dot);
 }
 
+export function codeBlock(source: string, language: string): string {
+  // バッククォート 3 つで固定しないのは、中身の行頭に ``` があると、そこでコードブロックが閉じてしまうため
+  const longest =
+    source.match(/`+/g)?.reduce((max, run) => Math.max(max, run.length), 0) ??
+    0;
+  const fence = '`'.repeat(Math.max(3, longest + 1));
+  const body = source.endsWith('\n') ? source : `${source}\n`;
+  return `${fence}${language}\n${body}${fence}\n`;
+}
+
 export function insertMarkers(
   markdown: string,
   targets: readonly MarkerTarget[],
