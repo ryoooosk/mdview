@@ -7,6 +7,11 @@
   "bin": {
     "mdv": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "!dist/**/*.test.js",
+    "styles/code.json"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
