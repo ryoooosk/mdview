@@ -2,7 +2,7 @@
 import { readFile } from 'node:fs/promises';
 import { text } from 'node:stream/consumers';
 import { parseArgs } from 'node:util';
-import { cacheKey, readCache, writeCache } from './cache.ts';
+import { cacheKey, pruneCache, readCache, writeCache } from './cache.ts';
 import { extractMermaidBlocks } from './extract.ts';
 import { insertMarkers, replaceMarkers, runGlow } from './glow.ts';
 import { kittyImage, pngWidth } from './kitty.ts';
@@ -37,25 +37,35 @@ async function main(): Promise<void> {
     process.stdout.write(await runGlow(markdown, columns));
     return;
   }
-  const { markdown: marked, images } = await renderDiagrams(markdown, columns);
+  const {
+    markdown: marked,
+    images,
+    saved,
+  } = await renderDiagrams(markdown, columns);
   process.stdout.write(replaceMarkers(await runGlow(marked, columns), images));
+  // 出力の前に消さないのは、古いキャッシュの削除を待たずに表示するため
+  if (saved) await pruneCache();
 }
 
 async function renderDiagrams(
   markdown: string,
   columns: number,
-): Promise<{ markdown: string; images: Map<number, string> }> {
+): Promise<{ markdown: string; images: Map<number, string>; saved: boolean }> {
   const blocks = extractMermaidBlocks(markdown);
   const renderer = createRenderer();
   const images = new Map<number, string>();
+  let saved = false;
   try {
     for (const [index, block] of blocks.entries()) {
-      const png = await loadDiagram(
-        block.source,
-        cacheKey(block.source, MERMAID_VERSION, RENDER_OPTIONS),
-        renderer,
-        index,
-      );
+      const key = cacheKey(block.source, MERMAID_VERSION, RENDER_OPTIONS);
+      let png = await readCache(key);
+      if (!png) {
+        png = await renderDiagram(renderer, block.source, index);
+        if (png) {
+          await writeCache(key, png);
+          saved = true;
+        }
+      }
       if (png) images.set(index, kittyImage(png, imageColumns(png, columns)));
     }
   } finally {
@@ -64,28 +74,22 @@ async function renderDiagrams(
   const targets = blocks.flatMap((block, index) =>
     images.has(index) ? [{ ...block, index }] : [],
   );
-  return { markdown: insertMarkers(markdown, targets), images };
+  return { markdown: insertMarkers(markdown, targets), images, saved };
 }
 
-async function loadDiagram(
-  source: string,
-  key: string,
+async function renderDiagram(
   renderer: Renderer,
+  source: string,
   index: number,
 ): Promise<Uint8Array | undefined> {
-  const cached = await readCache(key);
-  if (cached) return cached;
-  let png: Uint8Array;
   try {
-    png = await renderer.render(source);
+    return await renderer.render(source);
   } catch (error) {
     console.error(
       `mdview: diagram ${index + 1} could not be rendered: ${errorMessage(error)}`,
     );
     return undefined;
   }
-  await writeCache(key, png);
-  return png;
 }
 
 function imageColumns(png: Uint8Array, columns: number): number {

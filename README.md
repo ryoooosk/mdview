@@ -61,7 +61,9 @@ mdview: diagram 3 could not be rendered: Parse error on line 3:
 
 描画した PNG は `~/Library/Caches/mdview/` に保存する。図のソースと描画条件（mermaid のバージョン、テーマなど）が同じなら、次からはキャッシュを使う。図はターミナルの幅によらず同じ条件で描くので、ウィンドウの幅を変えても描き直さない。
 
-消したいときはディレクトリごと削除する。
+14 日使われていない PNG は、新しい図を保存したときに自動で消す。図を表示するたびに、使った PNG の更新日時を新しくしている。
+
+すぐにすべて消したいときは、ディレクトリごと削除する。
 
 ```bash
 rm -rf ~/Library/Caches/mdview

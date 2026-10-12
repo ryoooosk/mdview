@@ -33,7 +33,7 @@ flowchart TD
 
 ## 1回の実行で起きること
 
-図を表示する場合の流れ。図は1つずつ順に処理し、Chrome はキャッシュがない図を初めて描画するときに1回だけ起動する。そのため、すべての図がキャッシュ済みなら Chrome は起動しない。
+図を表示する場合の流れ。図は1つずつ順に処理し、Chrome はキャッシュがない図を初めて描画するときに1回だけ起動する。そのため、すべての図がキャッシュ済みなら Chrome は起動しない。新しく描画して保存した図があったときだけ、出力の後で古いキャッシュを消す。
 
 ```mermaid
 sequenceDiagram
@@ -72,6 +72,10 @@ sequenceDiagram
     cli->>glow: マーカー入りの Markdown
     glow-->>cli: 整形済みテキスト
     Note over cli: replaceMarkers でマーカーを含む行を画像に差し替える
+    opt 新しく保存した図がある
+        cli->>cache: pruneCache
+        Note over cache: 14 日使われていない PNG を消す
+    end
 ```
 
 ## マーカーの差し込みと差し替え
@@ -124,7 +128,7 @@ glow は画像を扱えないので、図をマーカー（図を置く位置の
 | `cli.ts` | 引数の解析と全体の制御。図ごとにキャッシュを引き、なければ描画する | `main` |
 | `terminal.ts` | 図を表示できるターミナルかの判定と、桁数の取得 | `supportsKittyGraphics`、`terminalColumns` |
 | `extract.ts` | mdast で mermaid コードブロックのソースと位置を取得する | `extractMermaidBlocks` |
-| `cache.ts` | 図のソースと描画条件からキーを作り、PNG を読み書きする | `cacheKey`、`readCache`、`writeCache` |
+| `cache.ts` | 図のソースと描画条件からキーを作り、PNG を読み書きする。14 日使われていない PNG を消す | `cacheKey`、`readCache`、`writeCache`、`pruneCache` |
 | `render.ts` | インストール済みの Chrome と mermaid-cli で PNG を描画する | `createRenderer`、`RENDER_OPTIONS` |
 | `kitty.ts` | PNG を kitty graphics protocol のエスケープシーケンスにする | `kittyImage`、`pngWidth` |
 | `glow.ts` | マーカーの差し込み、glow の呼び出し、マーカーの差し替え | `insertMarkers`、`runGlow`、`replaceMarkers` |
