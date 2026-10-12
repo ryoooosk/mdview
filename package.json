@@ -21,11 +21,16 @@
     "node": ">=24"
   },
   "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "12.3.4",
-      "onFail": "download"
-    }
+    "packageManager": [
+      {
+        "name": "npm"
+      },
+      {
+        "name": "pnpm",
+        "version": "12.3.4",
+        "onFail": "download"
+      }
+    ]
   },
   "packageManager": "pnpm@12.3.4",
   "dependencies": {
