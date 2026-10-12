@@ -5,7 +5,7 @@
   "description": "Render Markdown in the terminal with mermaid diagrams shown as images (kitty graphics protocol)",
   "type": "module",
   "bin": {
-    "mdview": "dist/cli.js"
+    "mdv": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",

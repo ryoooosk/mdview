@@ -26,7 +26,7 @@ import {
   terminalColumns,
 } from './terminal.ts';
 
-const USAGE = 'Usage: mdview [-w <columns>] <file.md | ->';
+const USAGE = 'Usage: mdv [-w <columns>] <file.md | ->';
 
 async function main(): Promise<void> {
   const { values, positionals } = parseCommandLine();
@@ -100,7 +100,7 @@ async function renderDiagram(
     return await renderer.render(source);
   } catch (error) {
     console.error(
-      `mdview: diagram ${index + 1} could not be rendered: ${errorMessage(error)}`,
+      `mdv: diagram ${index + 1} could not be rendered: ${errorMessage(error)}`,
     );
     return undefined;
   }
@@ -139,11 +139,11 @@ class UsageError extends Error {}
 
 main().catch((error: unknown) => {
   if (error instanceof UsageError) {
-    if (error.message) console.error(`mdview: ${error.message}`);
+    if (error.message) console.error(`mdv: ${error.message}`);
     console.error(USAGE);
     process.exitCode = 2;
     return;
   }
-  console.error(`mdview: ${errorMessage(error)}`);
+  console.error(`mdv: ${errorMessage(error)}`);
   process.exitCode = 1;
 });

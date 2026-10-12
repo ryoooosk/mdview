@@ -1,6 +1,6 @@
 # styles
 
-`code.json` は、Markdown 以外のファイル（`mdview data.json` など）をコードとして表示するときに、glow の `-s` に渡すスタイル。`src/glow.ts` の `runGlowCode` が使う。
+`code.json` は、Markdown 以外のファイル（`mdv data.json` など）をコードとして表示するときに、glow の `-s` に渡すスタイル。`src/glow.ts` の `runGlowCode` が使う。
 
 ## glow の dark を使わない理由
 
@@ -75,4 +75,4 @@ glow が使う glamour の版が変わると、dark の配色が変わること�
 1. glow の `go.mod` で、`charm.land/glamour/v2` の版を確かめる
 2. その版の glamour の `styles/dark.json` から、`document` と `code_block` を写す
 3. `code_block.margin` を 0 にする
-4. `glow -s dark <ファイル>` と `mdview <ファイル>` の出力が同じになることを確かめる。glow 自体が、コメントの色の番号を実行ごとに 241 と 242 で揺らすので、そこだけは違ってもよい
+4. `glow -s dark <ファイル>` と `mdv <ファイル>` の出力が同じになることを確かめる。glow 自体が、コメントの色の番号を実行ごとに 241 と 242 で揺らすので、そこだけは違ってもよい

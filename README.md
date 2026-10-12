@@ -31,15 +31,15 @@ pnpm build
 pnpm add -g link:$PWD
 ```
 
-最後のコマンドで、`mdview` コマンドがリポジトリへのシンボリックリンクとして入る。更新するときは `git pull` のあと `pnpm build` し直せばよい。
+最後のコマンドで、`mdv` コマンドがリポジトリへのシンボリックリンクとして入る。更新するときは `git pull` のあと `pnpm build` し直せばよい。
 
 ## 使い方
 
 ```bash
-mdview ノート.md            # ファイルを表示する
-mdview data.json            # Markdown 以外のファイルは、コードとして色分けして表示する
-cat ノート.md | mdview -    # 標準入力から読む
-mdview -w 80 ノート.md      # 80 桁の幅で表示する
+mdv ノート.md            # ファイルを表示する
+mdv data.json            # Markdown 以外のファイルは、コードとして色分けして表示する
+cat ノート.md | mdv -    # 標準入力から読む
+mdv -w 80 ノート.md      # 80 桁の幅で表示する
 ```
 
 `-w` を省くと、ターミナルの桁数に合わせる。ページャーは持たず、全文を標準出力に書き出すので、Ghostty のスクロールで読む。
@@ -55,7 +55,7 @@ mdview -w 80 ノート.md      # 80 桁の幅で表示する
 描画に失敗した図は、何番目の図かとエラー内容を標準エラー出力に出す。
 
 ```text
-mdview: diagram 3 could not be rendered: Parse error on line 3:
+mdv: diagram 3 could not be rendered: Parse error on line 3:
 ```
 
 ## キャッシュ
