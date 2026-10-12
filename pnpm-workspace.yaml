@@ -1,0 +1,3 @@
+allowBuilds:
+  puppeteer: false
+minimumReleaseAge: 20160

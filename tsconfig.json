@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2024", // 出力する JavaScript の構文の版。nvm の default（Node.js 24）でも動く範囲にする
+    "module": "nodenext", // Node.js のモジュール解決に従う。相対 import には拡張子が必要になる
+    "rootDir": "src", // 入力の起点。TypeScript 6 以降は省くとエラーになり、出力も dist/src/ 配下になる
+    "outDir": "dist", // ビルド結果の出力先
+    "strict": true, // 厳格な型チェックをまとめて有効にする
+    "verbatimModuleSyntax": true, // import・export を書いたとおりに出力する。型だけの import には import type が必要になる
+    "erasableSyntaxOnly": true, // enum など、Node.js の型除去で実行できない構文をエラーにする。テストでは .ts を Node.js で直接実行するため
+    "allowImportingTsExtensions": true, // 相対 import に .ts 拡張子を書けるようにする。テストから src/ の .ts を Node.js で直接読み込むため
+    "rewriteRelativeImportExtensions": true, // 出力時に、相対 import の .ts を .js に書き換える
+    "skipLibCheck": true, // node_modules 内の .d.ts の型チェックを省く
+    "types": ["node"]
+  },
+  "include": ["src"] // ビルド対象のファイル。テストも含めないと、エディタがテストを既定の設定で型チェックし、node の型が見つからない
+}
