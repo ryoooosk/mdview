@@ -7,6 +7,11 @@
   "bin": {
     "mdv": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "!dist/**/*.test.js",
+    "styles/code.json"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
@@ -21,11 +26,16 @@
     "node": ">=24"
   },
   "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "12.3.4",
-      "onFail": "download"
-    }
+    "packageManager": [
+      {
+        "name": "npm"
+      },
+      {
+        "name": "pnpm",
+        "version": "12.3.4",
+        "onFail": "download"
+      }
+    ]
   },
   "packageManager": "pnpm@12.3.4",
   "dependencies": {
@@ -33,6 +43,9 @@
     "mdast-util-from-markdown": "^2.0.3",
     "puppeteer": "^25.12.0",
     "unist-util-visit": "^5.1.0"
+  },
+  "puppeteer": {
+    "skipDownload": true
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",

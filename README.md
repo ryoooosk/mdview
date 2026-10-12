@@ -15,23 +15,29 @@ mermaid の図は次のように扱う。
 - macOS
 - Ghostty（図を表示するのに必要。kitty でも動く想定だが、未確認）
 - Node.js 24 以降
-- pnpm
 - glow（`brew install glow`）
 - Google Chrome
 
-図の描画にはインストール済みの Google Chrome を使う。`pnpm install` で puppeteer 用の Chrome はダウンロードしない。
+図の描画にはインストール済みの Google Chrome を使う。インストールするときに、puppeteer 用の Chrome はダウンロードしない。
 
-## セットアップ
+## インストール
 
 ```bash
-git clone https://github.com/ryoooosk/mdview.git
-cd mdview
-pnpm install
-pnpm build
-pnpm add -g link:$PWD
+npm install -g https://github.com/ryoooosk/mdview/releases/latest/download/mdview.tgz
 ```
 
-最後のコマンドで、`mdv` コマンドがリポジトリへのシンボリックリンクとして入る。更新するときは `git pull` のあと `pnpm build` し直せばよい。
+GitHub Releases にある最新のビルド済みパッケージから、`mdv` コマンドを入れる。更新するときも同じコマンドを実行すればよい。
+
+npm 11.20 では、インストールの最後に次のような警告が出る。
+
+```text
+npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn install-scripts   puppeteer@25.13.0 (postinstall: node install.mjs)
+```
+
+これは、依存パッケージの install スクリプトのうち、実行を許可するか決めていないものを npm が知らせる警告。puppeteer の install スクリプトは、本来は puppeteer 用の Chrome をダウンロードするもの。mdview では `package.json` の `puppeteer.skipDownload` でダウンロードを止めているので、スクリプトは実行されるが、何もダウンロードしない。
+
+手元で開発しながら使うときの入れ方は、[開発](#開発)を参照。
 
 ## 使い方
 
@@ -83,7 +89,17 @@ rm -rf ~/Library/Caches/mdview
 
 ## 開発
 
-開発には Node.js 26（`.nvmrc`）を使う。
+開発には Node.js 26（`.nvmrc`）と pnpm を使う。
+
+```bash
+git clone https://github.com/ryoooosk/mdview.git
+cd mdview
+pnpm install
+pnpm build
+pnpm add -g link:$PWD
+```
+
+最後のコマンドで、`mdv` コマンドがリポジトリへのシンボリックリンクとして入る。更新するときは `git pull` のあと `pnpm build` し直せばよい。
 
 ```bash
 pnpm build           # 型チェックして dist/ に出力する
