@@ -29,3 +29,11 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm biome:ci
       - run: pnpm test
+
+  dependabot-auto-merge:
+    needs: [ci]
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    uses: ryoooosk/reusable-workflows/.github/workflows/dependabot-auto-merge.yml@main
+    permissions:
+      contents: write
+      pull-requests: write
