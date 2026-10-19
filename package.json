@@ -40,7 +40,7 @@
   "packageManager": "pnpm@12.3.4",
   "dependencies": {
     "@mermaid-js/mermaid-cli": "12.0.0",
-    "mdast-util-from-markdown": "^2.0.3",
+    "mdast-util-from-markdown": "^2.1.0",
     "puppeteer": "^25.12.0",
     "unist-util-visit": "^5.1.0"
   },
@@ -48,8 +48,8 @@
     "skipDownload": true
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.14",
-    "@types/node": "^24.19.0",
+    "@biomejs/biome": "^2.5.15",
+    "@types/node": "^24.19.1",
     "typescript": "^7.0.2"
   }
 }
