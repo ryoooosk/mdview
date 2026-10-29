@@ -37,6 +37,8 @@ Markdown 以外のファイル（拡張子が `.md` などでないファイル�
 
 ターミナルの桁数（`-w` を省いたときは `terminal.ts` の `terminalColumns`）は、glow の折り返し幅と、画像を表示する桁数の上限に使う。図の描画には使わず、いつも幅 800px の viewport で描くので、キャッシュのキーにも桁数は入らない。
 
+図がある Markdown では、`terminal.ts` の `queryCellSize` が `/dev/tty` に `CSI 16 t` を書いて、セルの大きさ（ピクセル）を問い合わせる。セルの縦横比と PNG の縦横比から画像が何行を占めるかを計算し、画像は `C=1`（カーソルを動かさない）で送って、その行数の分だけ mdv が改行を出す。カーソルの移動を端末に任せないのは、Ghostty が画像の後に動かす行数を「画面の下端まで + 1 画面分」で打ち切り、それより高い図に後ろの本文が重なるため。200ms 待っても応答がなければ、行数を指定せず、カーソルの移動を端末に任せる。
+
 ## 1回の実行で起きること
 
 図を表示する場合の流れ。図は1つずつ順に処理し、Chrome はキャッシュがない図を初めて描画するときに1回だけ起動する。そのため、すべての図がキャッシュ済みなら Chrome は起動しない。新しく描画して保存した図があったときだけ、出力の後で古いキャッシュを消す。
@@ -132,11 +134,11 @@ glow は画像を扱えないので、図をマーカー（図を置く位置の
 | ファイル | 役割 | 主な関数 |
 | --- | --- | --- |
 | `cli.ts` | 引数の解析と全体の制御。図ごとにキャッシュを引き、なければ描画する | `main` |
-| `terminal.ts` | 図を表示できるターミナルかの判定と、桁数の取得 | `supportsKittyGraphics`、`terminalColumns` |
+| `terminal.ts` | 図を表示できるターミナルかの判定と、桁数・セルの大きさの取得 | `supportsKittyGraphics`、`terminalColumns`、`queryCellSize` |
 | `extract.ts` | mdast で mermaid コードブロックのソースと位置を取得する | `extractMermaidBlocks` |
 | `cache.ts` | 図のソースと描画条件からキーを作り、PNG を読み書きする。14 日使われていない PNG を消す | `cacheKey`、`readCache`、`writeCache`、`pruneCache` |
 | `render.ts` | インストール済みの Chrome と mermaid-cli で PNG を描画する | `createRenderer`、`RENDER_OPTIONS` |
-| `kitty.ts` | PNG を kitty graphics protocol のエスケープシーケンスにする | `kittyImage`、`pngWidth` |
+| `kitty.ts` | PNG を kitty graphics protocol のエスケープシーケンスにする | `kittyImage`、`pngWidth`、`pngHeight` |
 | `glow.ts` | Markdown かどうかの判定、マーカーの差し込み、glow の呼び出し、マーカーの差し替え | `isMarkdownFile`、`insertMarkers`、`runGlow`、`runGlowCode`、`replaceMarkers` |
 
-`extract.ts`・`kitty.ts`・`glow.ts` のテストは、同じディレクトリの `*.test.ts` にある（`pnpm test` で実行する）。ほかのモジュールにはまだテストがない。
+`extract.ts`・`kitty.ts`・`glow.ts`・`terminal.ts` のテストは、同じディレクトリの `*.test.ts` にある（`pnpm test` で実行する）。ほかのモジュールにはまだテストがない。
