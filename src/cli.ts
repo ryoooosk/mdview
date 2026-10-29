@@ -12,7 +12,7 @@ import {
   runGlow,
   runGlowCode,
 } from './glow.ts';
-import { kittyImage, pngWidth } from './kitty.ts';
+import { kittyImage, pngHeight, pngWidth } from './kitty.ts';
 import {
   createRenderer,
   DEVICE_SCALE_FACTOR,
@@ -22,6 +22,8 @@ import {
 } from './render.ts';
 import {
   CELL_WIDTH,
+  type CellSize,
+  queryCellSize,
   supportsKittyGraphics,
   terminalColumns,
 } from './terminal.ts';
@@ -69,6 +71,9 @@ async function renderDiagrams(
   const renderer = createRenderer();
   const images = new Map<number, string>();
   let saved = false;
+  // 描画の前に待たないのは、問い合わせの応答を待つ間に図の描画を進めるため
+  const cellSize =
+    blocks.length > 0 ? queryCellSize() : Promise.resolve(undefined);
   try {
     for (const [index, block] of blocks.entries()) {
       const key = cacheKey(block.source, MERMAID_VERSION, RENDER_OPTIONS);
@@ -80,7 +85,17 @@ async function renderDiagrams(
           saved = true;
         }
       }
-      if (png) images.set(index, kittyImage(png, imageColumns(png, columns)));
+      if (png) {
+        const imageWidth = imageColumns(png, columns);
+        images.set(
+          index,
+          kittyImage(
+            png,
+            imageWidth,
+            imageRows(png, imageWidth, await cellSize),
+          ),
+        );
+      }
     }
   } finally {
     await renderer.close();
@@ -110,6 +125,17 @@ function imageColumns(png: Uint8Array, columns: number): number {
   return Math.min(
     Math.ceil(pngWidth(png) / DEVICE_SCALE_FACTOR / CELL_WIDTH),
     columns,
+  );
+}
+
+function imageRows(
+  png: Uint8Array,
+  columns: number,
+  cell: CellSize | undefined,
+): number | undefined {
+  if (!cell) return undefined;
+  return Math.ceil(
+    (pngHeight(png) * columns * cell.width) / (pngWidth(png) * cell.height),
   );
 }
 

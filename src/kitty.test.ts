@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
-import { kittyImage, pngWidth } from './kitty.ts';
+import { kittyImage, pngHeight, pngWidth } from './kitty.ts';
 
 const ESC = '\x1b';
 
@@ -43,22 +43,46 @@ describe('kittyImage', () => {
       Buffer.from(png).toString('base64'),
     );
   });
+
+  test('行数を渡したら C=1 でカーソルを動かさず、画像の後に行数 - 1 個の改行を付ける', () => {
+    const png = new Uint8Array(7000).map((_, i) => i % 256);
+    const sequence = kittyImage(png, 40, 5);
+    assert.ok(sequence.endsWith(`${ESC}\\\n\n\n\n`));
+    assert.deepEqual(
+      parseChunks(sequence.trimEnd()).map(({ control }) => control),
+      ['f=100,a=T,q=2,c=40,C=1,m=1', 'm=1', 'm=0'],
+    );
+  });
 });
 
-describe('pngWidth', () => {
-  function pngHeader(width: number): Uint8Array {
-    const header = new Uint8Array(24);
-    new DataView(header.buffer).setUint32(16, width);
-    return header;
-  }
+function pngHeader(width: number, height: number): Uint8Array {
+  const header = new Uint8Array(24);
+  const view = new DataView(header.buffer);
+  view.setUint32(16, width);
+  view.setUint32(20, height);
+  return header;
+}
 
+describe('pngWidth', () => {
   test('IHDR チャンクから幅を読む', () => {
-    assert.equal(pngWidth(pngHeader(1234)), 1234);
+    assert.equal(pngWidth(pngHeader(1234, 567)), 1234);
   });
 
   test('byteOffset が 0 でない Uint8Array でも幅を読む', () => {
     const buffer = new Uint8Array(32);
-    buffer.set(pngHeader(1234), 8);
+    buffer.set(pngHeader(1234, 567), 8);
     assert.equal(pngWidth(buffer.subarray(8)), 1234);
+  });
+});
+
+describe('pngHeight', () => {
+  test('IHDR チャンクから高さを読む', () => {
+    assert.equal(pngHeight(pngHeader(1234, 567)), 567);
+  });
+
+  test('byteOffset が 0 でない Uint8Array でも高さを読む', () => {
+    const buffer = new Uint8Array(32);
+    buffer.set(pngHeader(1234, 567), 8);
+    assert.equal(pngHeight(buffer.subarray(8)), 567);
   });
 });
