@@ -24,6 +24,13 @@ jobs:
 
       - run: pnpm ci
       - run: pnpm build
+
+      - name: set version from tag
+        # タグ名を run に直接埋め込まないのは、タグ名に含まれる文字がシェルのコマンドとして実行されないようにするため
+        run: npm pkg set version="${TAG#v}"
+        env:
+          TAG: ${{ github.ref_name }}
+
       - run: pnpm pack --out mdview.tgz
 
       - name: create release
